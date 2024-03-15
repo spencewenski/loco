@@ -55,9 +55,29 @@
 //! ```rust
 #![doc = include_str!("././multi_db.rs")]
 //!````
+#[cfg(feature = "initializer-catch-panic")]
+pub mod catch_panic;
+#[cfg(feature = "initializer-composable")]
+pub mod composable;
+#[cfg(feature = "initializer-compression")]
+pub mod compression;
+#[cfg(feature = "initializer-cors")]
+pub mod cors;
+#[cfg(feature = "initializer-etag")]
+pub mod etag;
 #[cfg(feature = "initializer-extra-db")]
 pub mod extra_db;
+#[cfg(feature = "initializer-limit-payload")]
+pub mod limit_payload;
 #[cfg(feature = "initializer-multi-db")]
 pub mod multi_db;
+#[cfg(feature = "initializer-powered-by-header")]
+pub mod powered_by_header;
 #[cfg(feature = "initializer-prometheus")]
 pub mod prometheus;
+#[cfg(feature = "initializer-request-tracing")]
+pub mod request_tracing;
+#[cfg(feature = "initializer-static-assets")]
+pub mod static_assets;
+#[cfg(feature = "initializer-timeout")]
+pub mod timeout;

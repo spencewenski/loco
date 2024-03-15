@@ -2,6 +2,7 @@ use std::path::Path;
 
 use async_trait::async_trait;
 use loco_extras;
+use loco_extras::initializers::composable::ComposableInitializer;
 use loco_rs::{
     app::{AppContext, Hooks, Initializer},
     boot::{create_app, BootResult, StartMode},
@@ -43,6 +44,7 @@ impl Hooks for App {
 
     async fn initializers(ctx: &AppContext) -> Result<Vec<Box<dyn Initializer>>> {
         let mut initializers: Vec<Box<dyn Initializer>> = vec![
+            Box::new(ComposableInitializer::new().add_defaults()),
             Box::new(initializers::axum_session::AxumSessionInitializer),
             Box::new(initializers::view_engine::ViewEngineInitializer),
             Box::new(initializers::hello_view_engine::HelloViewEngineInitializer),

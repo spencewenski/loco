@@ -79,24 +79,15 @@ lettre = { version = "0.11.4", default-features = false, features = [
 ] }
 include_dir = "0.7.3"
 thiserror = "1"
-tracing = "0.1.40"
+tracing = { workspace = true }
 tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
 
 
 # cli/migrations
 duct = "0.13.6"
 
-tower-http = { version = "0.5.0", features = [
-  "trace",
-  "catch-panic",
-  "timeout",
-  "add-extension",
-  "cors",
-  "fs",
-  "set-header",
-  "compression-full",
-] }
-byte-unit = "4.0.19"
+tower-http = { workspace = true }
+byte-unit = { workspace = true }
 
 argon2 = { version = "0.5.2", features = ["std"] }
 rand = { version = "0.8.5", features = ["std"] }
@@ -118,7 +109,7 @@ cargo_metadata = "0.18.1"
 
 cfg-if = "1"
 
-uuid = { version = "1.6", features = ["v4"] }
+uuid = { workspace = true }
 requestty = "0.5.0"
 
 # A socket.io server implementation
@@ -131,6 +122,19 @@ object_store = { version = "0.9.0", default-features = false }
 [workspace.dependencies]
 async-trait = { version = "0.1.74" }
 axum = { version = "0.7.1", features = ["macros"] }
+tracing = "0.1.40"
+byte-unit = "4.0.19"
+tower-http = { version = "0.5.0", features = [
+  "trace",
+  "catch-panic",
+  "timeout",
+  "add-extension",
+  "cors",
+  "fs",
+  "set-header",
+  "compression-full",
+] }
+uuid = { version = "1.6", features = ["v4"] }
 
 [dependencies.sea-orm-migration]
 optional = true

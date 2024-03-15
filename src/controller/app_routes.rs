@@ -21,6 +21,7 @@ use tower_http::{
 #[cfg(feature = "channels")]
 use super::channels::AppChannels;
 use super::routes::Routes;
+use crate::controller::middleware::catch_panic::custom_catch_panic_layer;
 use crate::{
     app::AppContext, config, controller::middleware::etag::EtagLayer, environment::Environment,
     errors, Result,
@@ -186,39 +187,39 @@ impl AppRoutes {
 
             app = app.route(&router.uri, router.method);
         }
-
-        app = Self::add_powered_by_header(app, &ctx.config.server);
-
-        if let Some(catch_panic) = &ctx.config.server.middlewares.catch_panic {
-            if catch_panic.enable {
-                app = Self::add_catch_panic(app);
-            }
-        }
-
-        if let Some(compression) = &ctx.config.server.middlewares.compression {
-            if compression.enable {
-                app = Self::add_compression_middleware(app);
-            }
-        }
-
-        if let Some(limit) = &ctx.config.server.middlewares.limit_payload {
-            if limit.enable {
-                app = Self::add_limit_payload_middleware(app, limit)?;
-            }
-        }
-
-        if let Some(logger) = &ctx.config.server.middlewares.logger {
-            if logger.enable {
-                app = Self::add_logger_middleware(app, &ctx.environment);
-            }
-        }
-
-        if let Some(timeout_request) = &ctx.config.server.middlewares.timeout_request {
-            if timeout_request.enable {
-                app = Self::add_timeout_middleware(app, timeout_request);
-            }
-        }
-
+        // 
+        // app = Self::add_powered_by_header(app, &ctx.config.server);
+        // 
+        // if let Some(catch_panic) = &ctx.config.server.middlewares.catch_panic {
+        //     if catch_panic.enable {
+        //         app = Self::add_catch_panic(app);
+        //     }
+        // }
+        // 
+        // if let Some(compression) = &ctx.config.server.middlewares.compression {
+        //     if compression.enable {
+        //         app = Self::add_compression_middleware(app);
+        //     }
+        // }
+        // 
+        // if let Some(limit) = &ctx.config.server.middlewares.limit_payload {
+        //     if limit.enable {
+        //         app = Self::add_limit_payload_middleware(app, limit)?;
+        //     }
+        // }
+        // 
+        // if let Some(logger) = &ctx.config.server.middlewares.logger {
+        //     if logger.enable {
+        //         app = Self::add_logger_middleware(app, &ctx.environment);
+        //     }
+        // }
+        // 
+        // if let Some(timeout_request) = &ctx.config.server.middlewares.timeout_request {
+        //     if timeout_request.enable {
+        //         app = Self::add_timeout_middleware(app, timeout_request);
+        //     }
+        // }
+        // 
         let cors = ctx
             .config
             .server
@@ -228,24 +229,25 @@ impl AppRoutes {
             .filter(|cors| cors.enable)
             .map(Self::get_cors_middleware)
             .transpose()?;
+        // 
+        // if let Some(cors) = &cors {
+        //     app = app.layer(cors.clone());
+        //     tracing::info!("[Middleware] Adding cors");
+        // }
+        // 
+        // if let Some(static_assets) = &ctx.config.server.middlewares.static_assets {
+        //     if static_assets.enable {
+        //         app = Self::add_static_asset_middleware(app, static_assets)?;
+        //     }
+        // }
+        // 
+        // if let Some(etag) = &ctx.config.server.middlewares.etag {
+        //     if etag.enable {
+        //         app = Self::add_etag_middleware(app);
+        //     }
+        // }
 
-        if let Some(cors) = &cors {
-            app = app.layer(cors.clone());
-            tracing::info!("[Middleware] Adding cors");
-        }
-
-        if let Some(static_assets) = &ctx.config.server.middlewares.static_assets {
-            if static_assets.enable {
-                app = Self::add_static_asset_middleware(app, static_assets)?;
-            }
-        }
-
-        if let Some(etag) = &ctx.config.server.middlewares.etag {
-            if etag.enable {
-                app = Self::add_etag_middleware(app);
-            }
-        }
-
+        // Todo: initializer for this?
         #[cfg(feature = "channels")]
         if let Some(channels) = self.channels.as_ref() {
             tracing::info!("[Middleware] Adding channels");
@@ -348,7 +350,7 @@ impl AppRoutes {
     }
 
     fn add_catch_panic(app: AXRouter<AppContext>) -> AXRouter<AppContext> {
-        app.layer(CatchPanicLayer::custom(handle_panic))
+        app.layer(custom_catch_panic_layer())
     }
 
     fn add_limit_payload_middleware(
@@ -447,17 +449,4 @@ impl AppRoutes {
             app
         }
     }
-}
-
-/// Handler function for the [`CatchPanicLayer`] middleware.
-#[allow(clippy::needless_pass_by_value)]
-fn handle_panic(err: Box<dyn std::any::Any + Send + 'static>) -> axum::response::Response {
-    let err = err.downcast_ref::<String>().map_or_else(
-        || err.downcast_ref::<&str>().map_or("no error details", |s| s),
-        |s| s.as_str(),
-    );
-
-    tracing::error!(err.msg = err, "server_panic");
-
-    errors::Error::InternalServerError.into_response()
 }

@@ -12,10 +12,14 @@ path = "src/lib.rs"
 [dependencies]
 async-trait = { workspace = true }
 axum = { workspace = true }
+tracing = { workspace = true }
 # initializer
 axum-prometheus = { version = "0.6.1", optional = true }
 serde = { version = "1", optional = true }
 serde_json = { version = "1", optional = true }
+byte-unit = { workspace = true, optional = true }
+tower-http = { workspace = true, optional = true }
+uuid = { workspace = true, optional = true }
 
 [dependencies.loco-rs]
 path = "../"
@@ -28,8 +32,27 @@ full = [
     "initializer-prometheus",
     "initializer-extra-db",
     "initializer-multi-db",
+    "initializer-etag",
+    "initializer-catch-panic",
+    "initializer-request-tracing",
+    "initializer-timeout",
+    "initializer-compression",
+    "initializer-static-assets",
+    "initializer-powered-by-header",
+    "initializer-cors",
+    "initializer-composable",
 ]
 
 initializer-prometheus = ["dep:axum-prometheus"]
 initializer-extra-db = []
 initializer-multi-db = ["dep:serde_json"]
+initializer-etag = []
+initializer-catch-panic = []
+initializer-limit-payload = ["dep:byte-unit"]
+initializer-request-tracing = ["dep:tower-http", "dep:uuid"]
+initializer-timeout = []
+initializer-compression = []
+initializer-static-assets = []
+initializer-powered-by-header = []
+initializer-cors = []
+initializer-composable = []
